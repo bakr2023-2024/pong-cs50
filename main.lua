@@ -42,7 +42,15 @@ function love.update(dt)
 			ball.x = player2.x - 5
 			ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
 		end
-
+		if ball.x <= 0 then
+			player2:addScore()
+			ball:reset()
+			gameState = State.PAUSE
+		elseif ball.x >= VIRTUAL_WIDTH - ball.width then
+			player1:addScore()
+			ball:reset()
+			gameState = State.PAUSE
+		end
 	end
 	if love.keyboard.isDown("w") then
 		player1.dy = -PADDLE_SPEED
