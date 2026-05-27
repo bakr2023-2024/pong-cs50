@@ -6,14 +6,17 @@ VIRTUAL_HEIGHT = 243
 HVW = VIRTUAL_WIDTH / 2
 HVH = VIRTUAL_HEIGHT / 2
 
+MAX_SCORE = 10
+
 Class = require("class")
 require("Paddle")
 require("Ball")
 PADDLE_SPEED = 200
 State = {
 	START = 1,
-    SERVE = 2,
+	SERVE = 2,
 	PLAY = 3,
+	DONE = 4,
 }
 push = require("push")
 function love.load()
@@ -32,6 +35,7 @@ function love.load()
 	player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 5, 20)
 	ball = Ball(HVW - 2, HVH - 2, 4, 4)
 	serving = ball.dx < 0 and 2 or 1
+	winner = -1
 end
 function love.update(dt)
 	if gameState == State.SERVE then
@@ -47,13 +51,23 @@ function love.update(dt)
 		end
 		if ball.x <= 0 then
 			player2:addScore()
+			if player2.score == MAX_SCORE then
+				gameState = State.DONE
+				winner = 1
+			else
+				gameState = State.SERVE
+			end
 			ball:reset()
-			gameState = State.SERVE
 			serving = 1
 		elseif ball.x >= VIRTUAL_WIDTH - ball.width then
 			player1:addScore()
+			if player1.score == MAX_SCORE then
+				gameState = State.DONE
+				winner = 1
+			else
+				gameState = State.SERVE
+			end
 			ball:reset()
-			gameState = State.SERVE
 			serving = 2
 		end
 	end
@@ -84,9 +98,12 @@ function love.keypressed(key)
 	elseif key == "enter" or key == "return" then
 		if gameState == State.START then
 			gameState = State.SERVE
-        elseif gameState == State.SERVE then
+		elseif gameState == State.SERVE then
 			gameState = State.PLAY
-			ball:reset()
+		elseif gameState == State.DONE then
+			gameState = State.SERVE
+			player1.score = 0
+			player2.score = 0
 		end
 	end
 end
@@ -94,11 +111,26 @@ end
 function love.draw()
 	push:start()
 	love.graphics.clear(0.1569, 0.176, 0.204, 1)
-    love.graphics.setFont(smallFont)
+	love.graphics.setFont(smallFont)
     if gameState == State.START then
-    love.graphics.printf("Welcome to Pong!\nPress Enter to start",0,10,VIRTUAL_WIDTH,"center")
+		love.graphics.printf(
+			"Welcome to Pong!\nFirst player to get " .. tostring(MAX_SCORE) .. " points wins\nPress Enter to start",
+			0,
+			10,
+			VIRTUAL_WIDTH,
+			"center"
+		)
     elseif gameState == State.SERVE then
-    love.graphics.printf("Player "..tostring(serving) .." turn",0,10,VIRTUAL_WIDTH,"center")
+		love.graphics.printf("Player " .. tostring(serving) .. "'s turn", 0, 10, VIRTUAL_WIDTH, "center")
+    elseif gameState == State.DONE then
+		love.graphics.printf(
+			"Player " .. tostring(winner) .. " wins!\nPress Enter to restart",
+			0,
+			10,
+			VIRTUAL_WIDTH,
+			"center"
+		)
+
     end
 	love.graphics.setFont(largeFont)
 	player1:render()
