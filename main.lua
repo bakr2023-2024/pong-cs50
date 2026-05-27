@@ -26,33 +26,42 @@ function love.load()
 	p2Score = 0
 	p2y = VIRTUAL_HEIGHT - 30
 	ballX = HVW - 2
-	ballY = HVH - -2
+	ballY = HVH - 2
 	ballDx = math.random(2) and 100 or -100
 	ballDy = math.random(-50, 50)
+end
+function love.update(dt)
+	if love.keyboard.isDown("w") then
+		p1y = math.max(p1y - PADDLE_SPEED * dt, 0)
+	elseif love.keyboard.isDown("s") then
+		p1y = math.min(p1y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+	end
+	if love.keyboard.isDown("up") then
+		p2y = math.max(p2y - PADDLE_SPEED * dt, 0)
+	elseif love.keyboard.isDown("down") then
+		p2y = math.min(p2y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+	end
+	if gameState == State.PLAY then
+		ballX = ballX + ballDx * dt
+		ballY = ballY + ballDy * dt
+	end
 end
 function love.keypressed(key)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "enter" or key == "return" then
-		gameState = gameState == State.PAUSE and State.PLAY or State.PAUSE
+		if gameState == State.PLAY then
+			gameState = State.PAUSE
+			ballX = HVW - 2
+			ballY = HVH - 2
+		else
+			gameState = State.PLAY
+			ballDx = math.random(2) and 100 or -100
+			ballDy = math.random(-50, 50)
+		end
 	end
 end
-function love.update(dt)
-	if gameState == State.PLAY then
-		if love.keyboard.isDown("w") then
-			p1y = math.max(p1y - PADDLE_SPEED * dt, 0)
-		elseif love.keyboard.isDown("s") then
-			p1y = math.min(p1y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
-		end
-		if love.keyboard.isDown("up") then
-			p2y = math.max(p2y - PADDLE_SPEED * dt, 0)
-		elseif love.keyboard.isDown("down") then
-			p2y = math.min(p2y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
-		end
-		ballX = ballX + ballDx * dt
-		ballY = ballY + ballDy * dt
-	end
-end
+
 function love.draw()
 	push:start()
 	love.graphics.clear(0.1569, 0.176, 0.204, 1)
