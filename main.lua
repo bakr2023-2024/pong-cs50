@@ -9,9 +9,10 @@ HVH = VIRTUAL_HEIGHT / 2
 MAX_SCORE = 10
 
 Class = require("class")
+PLAYER_SPEED = 200
+AI_SPEED = 150
 require("Paddle")
 require("Ball")
-PADDLE_SPEED = 200
 State = {
 	START = 1,
 	SERVE = 2,
@@ -25,7 +26,7 @@ function love.load()
 	largeFont = love.graphics.newFont("font.ttf", 32)
 	smallFont = love.graphics.newFont("font.ttf", 8)
 	love.graphics.setFont(largeFont)
-	love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, { resizable = false, vsync = false, fullscreen = false })
+	love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, { resizable = true, vsync = false, fullscreen = false })
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
 
 	sounds = {
@@ -42,6 +43,9 @@ function love.load()
 	ball = Ball(HVW - 2, HVH - 2, 4, 4)
 	serving = ball.dx < 0 and 2 or 1
 	winner = -1
+end
+function love.resize(w, h)
+	push:resize(w, h)
 end
 function love.update(dt)
 	if gameState == State.SERVE then
@@ -90,20 +94,39 @@ function love.update(dt)
 			serving = 2
 		end
 	end
-
-	if love.keyboard.isDown("w") then
-		player1.dy = -PADDLE_SPEED
-	elseif love.keyboard.isDown("s") then
-		player1.dy = PADDLE_SPEED
+	if not player1.ai then
+		if love.keyboard.isDown("w") then
+			player1.dy = -PLAYER_SPEED
+		elseif love.keyboard.isDown("s") then
+			player1.dy = PLAYER_SPEED
+		else
+			player1.dy = 0
+		end
 	else
-		player1.dy = 0
+		if ball.y < player1.y and ball.dx < 0 then
+			player1.dy = -AI_SPEED
+		elseif ball.y > player1.y and ball.dx < 0 then
+			player1.dy = AI_SPEED
+		else
+			player1.dy = 0
+		end
 	end
-	if love.keyboard.isDown("up") then
-		player2.dy = -PADDLE_SPEED
-	elseif love.keyboard.isDown("down") then
-		player2.dy = PADDLE_SPEED
+	if not player2.ai then
+		if love.keyboard.isDown("up") then
+			player2.dy = -PLAYER_SPEED
+		elseif love.keyboard.isDown("down") then
+			player2.dy = PLAYER_SPEED
+		else
+			player2.dy = 0
+		end
 	else
-		player2.dy = 0
+		if ball.y < player2.y and ball.dx > 0 then
+			player2.dy = -AI_SPEED
+		elseif ball.y > player2.y and ball.dx > 0 then
+			player2.dy = AI_SPEED
+		else
+			player2.dy = 0
+		end
 	end
 	if gameState == State.PLAY then
 		ball:update(dt)
@@ -124,6 +147,10 @@ function love.keypressed(key)
 			player1.score = 0
 			player2.score = 0
 		end
+	elseif key == 'a' then
+		player1.ai = not player1.ai
+	elseif key == 'd' then
+		player2.ai = not player2.ai
 	end
 end
 

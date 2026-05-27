@@ -6,6 +6,7 @@ function Paddle:init(x, y, width, height)
 	self.height = height
 	self.dy = 0
 	self.score = 0
+	self.ai = false
 end
 
 function Paddle:update(dt)
@@ -15,5 +16,11 @@ function Paddle:addScore()
 	self.score = self.score + 1
 end
 function Paddle:render()
-	love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+	if self.ai then
+		love.graphics.setColor(0, 1, 0, 1)
+		love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+		love.graphics.setColor(1, 1, 1, 1)
+	else
+		love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+	end
 end
