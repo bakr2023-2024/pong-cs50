@@ -28,6 +28,12 @@ function love.load()
 	love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, { resizable = false, vsync = false, fullscreen = false })
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
 
+	sounds = {
+		["paddle"] = love.audio.newSource("sounds/paddle.wav", "static"),
+		["edge"] = love.audio.newSource("sounds/edge.wav", "static"),
+		["score"] = love.audio.newSource("sounds/score.wav", "static"),
+	}
+
 	math.randomseed(os.time())
 	gameState = State.START
 
@@ -45,15 +51,27 @@ function love.update(dt)
 		if ball:collides(player1) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player1.x + 5
+			love.audio.play(sounds["paddle"])
 		elseif ball:collides(player2) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player2.x - 5
+			love.audio.play(sounds["paddle"])
+		end
+		if ball.y >= VIRTUAL_HEIGHT - ball.height then
+			ball.y = VIRTUAL_HEIGHT - ball.height
+			ball.dy = -ball.dy
+			love.audio.play(sounds["edge"])
+		elseif ball.y <= 0 then
+			ball.y = 0
+			ball.dy = -ball.dy
+			love.audio.play(sounds["edge"])
 		end
 		if ball.x <= 0 then
 			player2:addScore()
+			love.audio.play(sounds["score"])
 			if player2.score == MAX_SCORE then
 				gameState = State.DONE
-				winner = 1
+				winner = 2
 			else
 				gameState = State.SERVE
 			end
@@ -61,6 +79,7 @@ function love.update(dt)
 			serving = 1
 		elseif ball.x >= VIRTUAL_WIDTH - ball.width then
 			player1:addScore()
+			love.audio.play(sounds["score"])
 			if player1.score == MAX_SCORE then
 				gameState = State.DONE
 				winner = 1

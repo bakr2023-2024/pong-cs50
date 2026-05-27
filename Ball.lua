@@ -12,13 +12,7 @@ end
 function Ball:update(dt)
 	self.x = self.x + self.dx * dt
 	self.y = self.y + self.dy * dt
-	if self.y >= VIRTUAL_HEIGHT - self.height then
-		self.y = VIRTUAL_HEIGHT - self.height
-		self.dy = -self.dy
-    elseif self.y <= 0 then
-		self.y = 0
-		self.dy = -self.dy
-	end
+
 end
 function Ball:collides(paddle)
 	return not (
