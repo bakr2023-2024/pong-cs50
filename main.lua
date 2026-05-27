@@ -74,8 +74,13 @@ function love.draw()
 	ball:render()
 	love.graphics.print(tostring(player1.score), HVW - 50, HVH - 80)
 	love.graphics.print(tostring(player2.score), HVW + 30, HVH - 80)
-
+	showFPS()
 	push:finish()
 end
 
-
+function showFPS()
+	love.graphics.setFont(smallFont)
+	love.graphics.setColor(0, 1, 0, 1)
+	love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+	love.graphics.setColor(1, 1, 1, 1)
+end
