@@ -11,8 +11,9 @@ require("Paddle")
 require("Ball")
 PADDLE_SPEED = 200
 State = {
-	PAUSE = 1,
-	PLAY = 2,
+	START = 1,
+    SERVE = 2,
+	PLAY = 3,
 }
 push = require("push")
 function love.load()
@@ -25,33 +26,38 @@ function love.load()
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
 
 	math.randomseed(os.time())
-	gameState = State.PAUSE
+	gameState = State.START
 
 	player1 = Paddle(10, 10, 5, 20)
 	player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 5, 20)
 	ball = Ball(HVW - 2, HVH - 2, 4, 4)
+	serving = ball.dx < 0 and 2 or 1
 end
 function love.update(dt)
-	if gameState == State.PLAY then
+	if gameState == State.SERVE then
+		ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
+		ball.dx = (serving == 1 and 1 or -1) * math.random(140, 200)
+	elseif gameState == State.PLAY then
 		if ball:collides(player1) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player1.x + 5
-			ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
 		elseif ball:collides(player2) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player2.x - 5
-			ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
 		end
 		if ball.x <= 0 then
 			player2:addScore()
 			ball:reset()
-			gameState = State.PAUSE
+			gameState = State.SERVE
+			serving = 1
 		elseif ball.x >= VIRTUAL_WIDTH - ball.width then
 			player1:addScore()
 			ball:reset()
-			gameState = State.PAUSE
+			gameState = State.SERVE
+			serving = 2
 		end
 	end
+
 	if love.keyboard.isDown("w") then
 		player1.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown("s") then
@@ -76,10 +82,10 @@ function love.keypressed(key)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "enter" or key == "return" then
-		if gameState == State.PAUSE then
+		if gameState == State.START then
+			gameState = State.SERVE
+        elseif gameState == State.SERVE then
 			gameState = State.PLAY
-		else
-			gameState = State.PAUSE
 			ball:reset()
 		end
 	end
@@ -88,6 +94,12 @@ end
 function love.draw()
 	push:start()
 	love.graphics.clear(0.1569, 0.176, 0.204, 1)
+    love.graphics.setFont(smallFont)
+    if gameState == State.START then
+    love.graphics.printf("Welcome to Pong!\nPress Enter to start",0,10,VIRTUAL_WIDTH,"center")
+    elseif gameState == State.SERVE then
+    love.graphics.printf("Player "..tostring(serving) .." turn",0,10,VIRTUAL_WIDTH,"center")
+    end
 	love.graphics.setFont(largeFont)
 	player1:render()
 	player2:render()
