@@ -6,6 +6,10 @@ VIRTUAL_HEIGHT = 243
 HVW = VIRTUAL_WIDTH / 2
 HVH = VIRTUAL_HEIGHT / 2
 PADDLE_SPEED = 200
+State = {
+	PAUSE = 1,
+	PLAY = 2,
+}
 push = require("push")
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
@@ -14,37 +18,50 @@ function love.load()
 	love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, { resizable = false, vsync = false, fullscreen = false })
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
 
+	math.randomseed(os.time())
+
+	gameState = State.PAUSE
 	p1Score = 0
 	p1y = 10
 	p2Score = 0
 	p2y = VIRTUAL_HEIGHT - 30
+	ballX = HVW - 2
+	ballY = HVH - -2
+	ballDx = math.random(2) and 100 or -100
+	ballDy = math.random(-50, 50)
 end
 function love.keypressed(key)
 	if key == "escape" then
 		love.event.quit()
+	elseif key == "enter" or key == "return" then
+		gameState = gameState == State.PAUSE and State.PLAY or State.PAUSE
 	end
 end
 function love.update(dt)
-	if love.keyboard.isDown("w") then
-		p1y = math.max(p1y - PADDLE_SPEED * dt, 0)
-	elseif love.keyboard.isDown("s") then
-		p1y = math.min(p1y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
-	end
-	if love.keyboard.isDown("up") then
-		p2y = math.max(p2y - PADDLE_SPEED * dt, 0)
-	elseif love.keyboard.isDown("down") then
-		p2y = math.min(p2y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+	if gameState == State.PLAY then
+		if love.keyboard.isDown("w") then
+			p1y = math.max(p1y - PADDLE_SPEED * dt, 0)
+		elseif love.keyboard.isDown("s") then
+			p1y = math.min(p1y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+		end
+		if love.keyboard.isDown("up") then
+			p2y = math.max(p2y - PADDLE_SPEED * dt, 0)
+		elseif love.keyboard.isDown("down") then
+			p2y = math.min(p2y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+		end
+		ballX = ballX + ballDx * dt
+		ballY = ballY + ballDy * dt
 	end
 end
 function love.draw()
 	push:start()
-	love.graphics.clear(40 / 255, 45 / 255, 52 / 255, 1)
+	love.graphics.clear(0.1569, 0.176, 0.204, 1)
 	-- paddle 1
 	love.graphics.rectangle("fill", 10, p1y, 5, 20)
 	-- paddle 2
 	love.graphics.rectangle("fill", VIRTUAL_WIDTH - 15, p2y, 5, 20)
 	-- ball
-	love.graphics.rectangle("fill", HVW - 2, HVH - 2, 4, 4)
+	love.graphics.rectangle("fill", ballX, ballY, 4, 4)
 	-- p1 score
 	love.graphics.print(tostring(p1Score), HVW - 50, HVH - 80)
 	-- p2 score
