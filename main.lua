@@ -5,6 +5,10 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 HVW = VIRTUAL_WIDTH / 2
 HVH = VIRTUAL_HEIGHT / 2
+
+Class = require("class")
+require("Paddle")
+
 PADDLE_SPEED = 200
 State = {
 	PAUSE = 1,
@@ -21,10 +25,8 @@ function love.load()
 	math.randomseed(os.time())
 
 	gameState = State.PAUSE
-	p1Score = 0
-	p1y = 10
-	p2Score = 0
-	p2y = VIRTUAL_HEIGHT - 30
+	player1 = Paddle(10, 10, 5, 20)
+	player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 5, 20)
 	ballX = HVW - 2
 	ballY = HVH - 2
 	ballDx = math.random(2) and 100 or -100
@@ -32,30 +34,36 @@ function love.load()
 end
 function love.update(dt)
 	if love.keyboard.isDown("w") then
-		p1y = math.max(p1y - PADDLE_SPEED * dt, 0)
+		player1.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown("s") then
-		p1y = math.min(p1y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+		player1.dy = PADDLE_SPEED
+	else
+		player1.dy = 0
 	end
 	if love.keyboard.isDown("up") then
-		p2y = math.max(p2y - PADDLE_SPEED * dt, 0)
+		player2.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown("down") then
-		p2y = math.min(p2y + PADDLE_SPEED * dt, VIRTUAL_HEIGHT - 20)
+		player2.dy = PADDLE_SPEED
+	else
+		player2.dy = 0
 	end
 	if gameState == State.PLAY then
 		ballX = ballX + ballDx * dt
 		ballY = ballY + ballDy * dt
 	end
+	player1:update(dt)
+	player2:update(dt)
 end
 function love.keypressed(key)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "enter" or key == "return" then
-		if gameState == State.PLAY then
+		if gameState == State.PAUSE then
+			gameState = State.PLAY
+		else
 			gameState = State.PAUSE
 			ballX = HVW - 2
 			ballY = HVH - 2
-		else
-			gameState = State.PLAY
 			ballDx = math.random(2) and 100 or -100
 			ballDy = math.random(-50, 50)
 		end
@@ -65,15 +73,10 @@ end
 function love.draw()
 	push:start()
 	love.graphics.clear(0.1569, 0.176, 0.204, 1)
-	-- paddle 1
-	love.graphics.rectangle("fill", 10, p1y, 5, 20)
-	-- paddle 2
-	love.graphics.rectangle("fill", VIRTUAL_WIDTH - 15, p2y, 5, 20)
-	-- ball
+	player1:render()
+	player2:render()
 	love.graphics.rectangle("fill", ballX, ballY, 4, 4)
-	-- p1 score
-	love.graphics.print(tostring(p1Score), HVW - 50, HVH - 80)
-	-- p2 score
-	love.graphics.print(tostring(p2Score), HVW + 30, HVH - 80)
+	love.graphics.print(tostring(player1.score), HVW - 50, HVH - 80)
+	love.graphics.print(tostring(player2.score), HVW + 30, HVH - 80)
 	push:finish()
 end
