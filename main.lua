@@ -5,6 +5,7 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 push = require("push")
 function love.load()
+
 	love.graphics.setDefaultFilter("nearest", "nearest")
 	font = love.graphics.newFont("font.ttf", 32)
 	love.graphics.setFont(font)
@@ -19,6 +20,11 @@ end
 function love.draw()
 	push:start()
 	love.graphics.clear(45 / 255, 50 / 255, 20 / 255, 1)
-	love.graphics.printf("Hello Pong!", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, "center")
+	-- paddle 1
+	love.graphics.rectangle("fill", 10, 10, 5, 20)
+	-- paddle 2
+	love.graphics.rectangle("fill", VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 5, 20)
+	-- ball
+	love.graphics.rectangle("fill", VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 	push:finish()
 end
