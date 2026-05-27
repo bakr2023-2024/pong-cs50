@@ -8,7 +8,7 @@ HVH = VIRTUAL_HEIGHT / 2
 
 Class = require("class")
 require("Paddle")
-
+require("Ball")
 PADDLE_SPEED = 200
 State = {
 	PAUSE = 1,
@@ -23,14 +23,11 @@ function love.load()
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
 
 	math.randomseed(os.time())
-
 	gameState = State.PAUSE
+
 	player1 = Paddle(10, 10, 5, 20)
 	player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 5, 20)
-	ballX = HVW - 2
-	ballY = HVH - 2
-	ballDx = math.random(2) and 100 or -100
-	ballDy = math.random(-50, 50)
+	ball = Ball(HVW - 2, HVW - 2, 4, 4)
 end
 function love.update(dt)
 	if love.keyboard.isDown("w") then
@@ -48,8 +45,7 @@ function love.update(dt)
 		player2.dy = 0
 	end
 	if gameState == State.PLAY then
-		ballX = ballX + ballDx * dt
-		ballY = ballY + ballDy * dt
+		ball:update(dt)
 	end
 	player1:update(dt)
 	player2:update(dt)
@@ -62,10 +58,7 @@ function love.keypressed(key)
 			gameState = State.PLAY
 		else
 			gameState = State.PAUSE
-			ballX = HVW - 2
-			ballY = HVH - 2
-			ballDx = math.random(2) and 100 or -100
-			ballDy = math.random(-50, 50)
+			ball:reset()
 		end
 	end
 end
@@ -75,7 +68,7 @@ function love.draw()
 	love.graphics.clear(0.1569, 0.176, 0.204, 1)
 	player1:render()
 	player2:render()
-	love.graphics.rectangle("fill", ballX, ballY, 4, 4)
+	ball:render()
 	love.graphics.print(tostring(player1.score), HVW - 50, HVH - 80)
 	love.graphics.print(tostring(player2.score), HVW + 30, HVH - 80)
 	push:finish()
