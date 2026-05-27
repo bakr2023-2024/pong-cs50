@@ -51,24 +51,24 @@ function love.update(dt)
 		if ball:collides(player1) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player1.x + 5
-			love.audio.play(sounds["paddle"])
+			sounds["paddle"]:play()
 		elseif ball:collides(player2) then
 			ball.dx = -ball.dx * 1.03
 			ball.x = player2.x - 5
-			love.audio.play(sounds["paddle"])
+			sounds["paddle"]:play()
 		end
 		if ball.y >= VIRTUAL_HEIGHT - ball.height then
 			ball.y = VIRTUAL_HEIGHT - ball.height
 			ball.dy = -ball.dy
-			love.audio.play(sounds["edge"])
+			sounds["edge"]:play()
 		elseif ball.y <= 0 then
 			ball.y = 0
 			ball.dy = -ball.dy
-			love.audio.play(sounds["edge"])
+			sounds["edge"]:play()
 		end
 		if ball.x <= 0 then
 			player2:addScore()
-			love.audio.play(sounds["score"])
+			sounds["score"]:play()
 			if player2.score == MAX_SCORE then
 				gameState = State.DONE
 				winner = 2
@@ -79,7 +79,7 @@ function love.update(dt)
 			serving = 1
 		elseif ball.x >= VIRTUAL_WIDTH - ball.width then
 			player1:addScore()
-			love.audio.play(sounds["score"])
+			sounds["score"]:play()
 			if player1.score == MAX_SCORE then
 				gameState = State.DONE
 				winner = 1
