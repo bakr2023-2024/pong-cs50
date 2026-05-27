@@ -32,6 +32,17 @@ function love.load()
 	ball = Ball(HVW - 2, HVH - 2, 4, 4)
 end
 function love.update(dt)
+	if gameState == State.PLAY then
+		if ball:collides(player1) then
+			ball.dx = -ball.dx * 1.03
+			ball.x = player1.x + 5
+			ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
+		elseif ball:collides(player2) then
+			ball.dx = -ball.dx * 1.03
+			ball.x = player2.x - 5
+			ball.dy = (ball.dy < 0 and -1 or 1) * math.random(10, 150)
+		end
+	end
 	if love.keyboard.isDown("w") then
 		player1.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown("s") then
@@ -81,6 +92,6 @@ end
 function showFPS()
 	love.graphics.setFont(smallFont)
 	love.graphics.setColor(0, 1, 0, 1)
-	love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+	love.graphics.print(tostring(love.timer.getFPS()), 1, 1)
 	love.graphics.setColor(1, 1, 1, 1)
 end

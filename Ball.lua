@@ -12,8 +12,18 @@ end
 function Ball:update(dt)
 	self.x = self.x + self.dx * dt
 	self.y = self.y + self.dy * dt
+	if self.y >= VIRTUAL_HEIGHT - self.height or self.y <= 0 then
+		self.dy = -self.dy
+	end
 end
-
+function Ball:collides(paddle)
+	return not (
+		ball.x >= paddle.x + paddle.width
+		or paddle.x >= ball.x + ball.width
+		or ball.y >= paddle.y + paddle.height
+		or paddle.y >= ball.y + ball.height
+	)
+end
 function Ball:render()
 	love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end
