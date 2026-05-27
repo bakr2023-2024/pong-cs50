@@ -23,7 +23,7 @@ function love.keypressed(key)
 end
 function love.draw()
 	push:start()
-	love.graphics.clear(45 / 255, 50 / 255, 20 / 255, 1)
+	love.graphics.clear(40 / 255, 45 / 255, 52 / 255, 1)
 	-- paddle 1
 	love.graphics.rectangle("fill", 10, 10, 5, 20)
 	-- paddle 2
